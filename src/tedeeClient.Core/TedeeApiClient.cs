@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using tedeeClient.Core.Api.ApiTokenProvider;
 using tedeeClient.Core.Api.UrlBuilder;
@@ -20,6 +17,10 @@ public class TedeeApiClient(
 {
 	#region const
 	private const string URL_BRIDGE = "bridge";
+	private const string URL_LOCK = "lock";
+	private const string COMMAND_LOCK = "lock";
+	private const string COMMAND_UNLOCK = "unlock";
+	private const string COMMAND_PULL = "pull";
 	#endregion
 
 	#region fields
@@ -35,46 +36,43 @@ public class TedeeApiClient(
 	{
 		var url = _urlBuilder.GetUrl(
 			_tokenProvider,
-			URL_BRIDGE,
-			null);
+			[URL_BRIDGE]);
 		return _requestExecutor.ExecuteGet<BridgeDto>(url);
 	}
-	//public Task<ApiResult<IEnumerable<LockDto>>> GetLocks() { }
-	//public Task<ApiResult<LockDto>> GetLockDetails(int lockId) { }
-	//public Task<ApiResult> LockLock(int lockId) { }
-	//public Task<ApiResult> UnlockLock(int lockId) { }
-	//public Task<ApiResult> PullLock(int lockId) { }
-	#endregion
-}
-
-public class RequestExecutor
-{
-	public async Task<ApiResult<TResult>> ExecuteGet<TResult>(string url)
-		where TResult : class
+	public Task<ApiResult<IEnumerable<LockDto>>> GetLocks()
 	{
-		var client = new HttpClient();
-		try
-		{
-			var resonse = await client.GetAsync(url);
-			return new ApiResult<TResult>
-			{
-				Success = resonse.IsSuccessStatusCode,
-				Result = resonse.IsSuccessStatusCode
-					? JsonSerializer.Deserialize<TResult>(await resonse.Content.ReadAsStreamAsync())
-					: null,
-				Message = resonse.IsSuccessStatusCode
-					? null
-					: await resonse.Content.ReadAsStringAsync()
-			};
-		}
-		catch (Exception ex)
-		{
-			return new ApiResult<TResult>
-			{
-				Success = false,
-				Result = default,
-				Message = ex.Message,
-			};
-		}
+		var url = _urlBuilder.GetUrl(
+			_tokenProvider,
+			[URL_LOCK]);
+		return _requestExecutor.ExecuteGet<IEnumerable<LockDto>>(url);
 	}
+	public Task<ApiResult<LockDto>> GetLockDetails(int lockId)
+	{
+		var url = _urlBuilder.GetUrl(
+				_tokenProvider,
+				[URL_LOCK, lockId.ToString()]);
+		return _requestExecutor.ExecuteGet<LockDto>(url);
+	}
+	public Task<ApiResult> LockLock(int lockId)
+	{
+		var url = _urlBuilder.GetUrl(
+			_tokenProvider,
+			[URL_LOCK, lockId.ToString(), COMMAND_LOCK]);
+		return _requestExecutor.ExecutePost(url);
+	}
+	public Task<ApiResult> UnlockLock(int lockId)
+	{
+		var url = _urlBuilder.GetUrl(
+				_tokenProvider,
+				[URL_LOCK, lockId.ToString(), COMMAND_UNLOCK]);
+		return _requestExecutor.ExecutePost(url);
+	}
+	public Task<ApiResult> PullLock(int lockId)
+	{
+		var url = _urlBuilder.GetUrl(
+					_tokenProvider,
+					[URL_LOCK, lockId.ToString(), COMMAND_PULL]);
+		return _requestExecutor.ExecutePost(url);
+	}
+	#endregion
 }

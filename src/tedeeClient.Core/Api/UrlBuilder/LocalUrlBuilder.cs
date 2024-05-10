@@ -8,16 +8,15 @@ internal class LocalUrlBuilder(string ipAddress, EApiVersion apiVersion)
 	: IUrlBuilder
 {
 	private const string HTTP = "http://";
-	public string GetUrl(IApiTokenProvider tokenProvider, string route, string? argument)
+	public string GetUrl(IApiTokenProvider tokenProvider, string[] route)
 	{
 		var sb = new StringBuilder();
 		sb.Append(HTTP);
 		sb.Append(ipAddress);
 		sb.Append('/').Append(apiVersion.ToString().ToLower().Replace('_', '.'));
-		sb.Append('/').Append(route);
-		if (argument is { Length: > 0 })
+		foreach (var segment in route)
 		{
-			sb.Append('/').Append(argument);
+			sb.Append('/').Append(segment);
 		}
 		sb.Append("?api_token=").Append(tokenProvider.GetToken());
 		return sb.ToString();

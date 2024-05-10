@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace tedeeClient.Core.Converters;
-internal class IntBoolConverter : JsonConverter<int>
+internal class IntBoolConverter : JsonConverter<bool>
 {
-	public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		throw new NotImplementedException();
+		var value = reader.GetInt32();
+		return value is 1;
 	}
 
-	public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+	public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
 	{
 		throw new NotImplementedException();
 	}
