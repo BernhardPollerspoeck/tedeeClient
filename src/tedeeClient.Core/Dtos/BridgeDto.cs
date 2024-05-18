@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using tedeeClient.Core.Converters;
 
 namespace tedeeClient.Core.Dtos;
 
@@ -15,3 +15,31 @@ public record BridgeDto(
 			bool IsConnected,
 	[property: JsonPropertyName("version")] string Version,
 	[property: JsonPropertyName("wifiVersion")] string WifiVersion);
+
+public class IntBoolConverter : JsonConverter<bool>
+{
+	public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	{
+		var value = reader.GetInt32();
+		return value is 1;
+	}
+
+	public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+	{
+		throw new NotImplementedException();
+	}
+}
+
+public class IntTimeSpanConverter : JsonConverter<TimeSpan>
+{
+	public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	{
+		var value = reader.GetInt32();
+		return TimeSpan.FromSeconds(value);
+	}
+
+	public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
+	{
+		throw new NotImplementedException();
+	}
+}

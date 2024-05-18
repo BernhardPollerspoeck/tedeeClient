@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using tedeeClient.Core.Converters;
 
 namespace tedeeClient.Core.Dtos;
 
