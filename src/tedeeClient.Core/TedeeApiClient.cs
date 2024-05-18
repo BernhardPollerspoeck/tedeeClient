@@ -117,6 +117,9 @@ public class TedeeApiClient(
 	#region const
 	private const string URL_BRIDGE = "bridge";
 	private const string URL_LOCK = "lock";
+	private const string ACTION_LOCK = "lock";
+	private const string ACTION_UNLOCK = "unlock";
+	private const string ACTION_PULL = "pull";
 	#endregion
 
 	#region fields
@@ -146,9 +149,22 @@ public class TedeeApiClient(
 		var request = _requestBuilder.BuildRequestForUrl($"{URL_LOCK}/{lockId}");
 		return _requestExecutor.ExecuteGet<LockDto>(request);
 	}
-	//public Task<ApiResult> LockLock(int lockId) { }
-	//public Task<ApiResult> UnlockLock(int lockId) { }
-	//public Task<ApiResult> PullLock(int lockId) { }
+	public Task<ApiResult> LockLock(int lockId)
+	{
+		var request = _requestBuilder.BuildRequestForUrl($"{URL_LOCK}/{lockId}/{ACTION_LOCK}");
+		return _requestExecutor.ExecutePost(request);
+	}
+
+	public Task<ApiResult> UnlockLock(int lockId)
+	{
+		var request = _requestBuilder.BuildRequestForUrl($"{URL_LOCK}/{lockId}/{ACTION_UNLOCK}");
+		return _requestExecutor.ExecutePost(request);
+	}
+	public Task<ApiResult> PullLock(int lockId)
+	{
+		var request = _requestBuilder.BuildRequestForUrl($"{URL_LOCK}/{lockId}/{ACTION_PULL}");
+		return _requestExecutor.ExecutePost(request);
+	}
 	#endregion
 }
 
@@ -183,10 +199,44 @@ public class RequestExecutor
 			};
 		}
 	}
+
+	public async Task<ApiResult> ExecutePost(TedeeRequest request)
+	{
+		var client = new HttpClient();
+		try
+		{
+			var resonse = await client.GetAsync(request.Url);
+			return resonse.IsSuccessStatusCode switch
+			{
+				true => new SuccessApiResult(),
+				_ => new ErrorApiResult
+				{
+					Exception = null,
+					Message = await resonse.Content.ReadAsStringAsync()
+				}
+			};
+		}
+		catch (Exception ex)
+		{
+			return new ErrorApiResult
+			{
+				Exception = ex,
+				Message = ex.Message,
+			};
+		}
+	}
 }
 
 public class ApiResult
 {
+}
+public class SuccessApiResult : ApiResult
+{
+}
+public class ErrorApiResult : ApiResult
+{
+	public required Exception? Exception { get; init; }
+	public required string Message { get; init; }
 }
 public class ApiResult<TResult>
 {

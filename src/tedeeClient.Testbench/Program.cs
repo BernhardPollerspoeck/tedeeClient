@@ -28,14 +28,15 @@ var locks = await client.GetLocks();
 var lockDetail = await client.GetLockDetails(LOCK_ID);
 //await client.LockLock(LOCK_ID);
 //await client.UnlockLock(LOCK_ID);
-//await client.PullLock(LOCK_ID);
+await client.PullLock(LOCK_ID);
 
 
 Console.WriteLine("");
 
 
 
-
+//TODO: test local encrypted token
+//TODO: test cloud
 
 
 
