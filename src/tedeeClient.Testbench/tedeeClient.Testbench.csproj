@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tedeeClient.Core\tedeeClient.Core.csproj" />
+    <ProjectReference Include="..\tedeeClient.Local\tedeeClient.Local.csproj" />
   </ItemGroup>
 
 </Project>
